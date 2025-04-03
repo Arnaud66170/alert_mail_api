@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 import smtplib
 import os
+from email.mime.text import MIMEText
 
 app = FastAPI()
 
@@ -26,10 +27,16 @@ async def send_alert(request: Request):
         with smtplib.SMTP(smtp_server, port) as server:
             server.starttls()
             server.login(sender, password)
+            
             subject = f"[ALERTE] {nb} feedbacks négatifs reçus"
             body = f"{nb} tweets négatifs détectés en 5 min !"
-            message = f"Subject: {subject}\n\n{body}"
-            server.sendmail(sender, receiver, message)
+            
+            msg = MIMEText(body, _charset="utf-8")
+            msg["Subject"] = subject
+            msg["From"] = sender
+            msg["To"] = receiver
+
+            server.sendmail(sender, receiver, msg.as_string())
         return {"status": "success"}
     except Exception as e:
         return {"status": "fail", "error": str(e)}
