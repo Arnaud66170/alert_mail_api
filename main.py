@@ -24,19 +24,20 @@ async def send_alert(request: Request):
     print(f"Password present: {bool(password)}")
 
     try:
+        subject = f"[ALERTE] {nb} feedbacks négatifs reçus"
+        body = f"{nb} tweets négatifs détectés en 5 min !"
+        msg = MIMEText(body, _charset="utf-8")
+        msg["Subject"] = subject
+        msg["From"] = sender
+        msg["To"] = receiver
+
         with smtplib.SMTP(smtp_server, port) as server:
             server.starttls()
             server.login(sender, password)
-            
-            subject = f"[ALERTE] {nb} feedbacks négatifs reçus"
-            body = f"{nb} tweets négatifs détectés en 5 min !"
-            
-            msg = MIMEText(body, _charset="utf-8")
-            msg["Subject"] = subject
-            msg["From"] = sender
-            msg["To"] = receiver
-
             server.sendmail(sender, receiver, msg.as_string())
+
+        print("✅ Email envoyé avec succès.")
         return {"status": "success"}
     except Exception as e:
+        print(f"❌ Erreur lors de l’envoi : {e}")
         return {"status": "fail", "error": str(e)}
