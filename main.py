@@ -25,7 +25,7 @@ async def send_alert(request: Request):
 
     try:
         subject = f"[ALERTE] {nb} feedbacks négatifs reçus"
-        body = f"{nb} tweets négatifs détectés en 5 min !"
+        body = f"{nb} Feedbacks négatifs détectés en 5 min !"
         msg = MIMEText(body, _charset="utf-8")
         msg["Subject"] = subject
         msg["From"] = sender
